@@ -1,33 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-const { QnAMakerDialog } = require('botbuilder-ai');
+const { createQnAMakerDialog } = require('./myQnADialog');
 const {
+    Dialog,
     ComponentDialog,
-    DialogSet,
-    DialogTurnStatus,
     WaterfallDialog,
 } = require('botbuilder-dialogs');
-const { MessageFactory } = require('botbuilder');
 
-const INITIAL_DIALOG = 'initial-dialog';
-const ROOT_DIALOG = 'root-dialog';
-const QNAMAKER_BASE_DIALOG = 'qnamaker-base-dialog';
-
-/**
- * Creates QnAMakerDialog instance with provided configuraton values.
- */
-const createQnAMakerDialog = (knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer) => {
-    let noAnswerActivity;
-    if (typeof defaultAnswer === 'string') {
-        noAnswerActivity = MessageFactory.text(defaultAnswer);
-    }
-
-    const qnaMakerDialog = new QnAMakerDialog(knowledgeBaseId, endpointKey, endpointHostName, noAnswerActivity);
-    qnaMakerDialog.id = QNAMAKER_BASE_DIALOG;
-
-    return qnaMakerDialog;
-}
+const ComplaintDialogId = 'ComplaintDialog';
+const MyQnADialogId = 'MyQnADialog';
 
 class RootDialog extends ComponentDialog {
     /**
@@ -38,37 +20,31 @@ class RootDialog extends ComponentDialog {
      * @param {string} defaultAnswer (optional) Text used to create a fallback response when QnA Maker doesn't have an answer for a question.
      */
     constructor(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer) {
-        super(ROOT_DIALOG);
-        // Initial waterfall dialog.
-        this.addDialog(new WaterfallDialog(INITIAL_DIALOG, [
-            this.startInitialDialog.bind(this)
+        super('RootDialog');
+
+        // Use helper to create subclassed QnAMakerDialog and configure dialogId.
+        const qnaMakerDialog = createQnAMakerDialog(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer);
+        qnaMakerDialog.id = MyQnADialogId;
+
+        // Add subclass to RootDialog and configure RootDialog to call qnaMakerDialog at beginning of conversations.
+        this.addDialog(qnaMakerDialog);
+
+        // Register WaterfallDialog for handling user complaints.
+        this.addDialog(new WaterfallDialog(ComplaintDialogId, [
+            this.beginFilingComplaint.bind(this),
+            this.finishFilingComplaint.bind(this),
         ]));
-
-        this.addDialog(createQnAMakerDialog(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer));
-        this.initialDialogId = INITIAL_DIALOG;
+        this.initialDialogId = qnaMakerDialog.id;
     }
 
-    /**
-     * The run method handles the incoming activity (in the form of a TurnContext) and passes it through the dialog system.
-     * If no dialog is active, it will start the default dialog.
-     * @param {*} turnContext
-     * @param {*} accessor
-     */
-    async run(context, accessor) {
-        const dialogSet = new DialogSet(accessor);
-        dialogSet.add(this);
-
-        const dialogContext = await dialogSet.createContext(context);
-        const results = await dialogContext.continueDialog();
-        if (results.status === DialogTurnStatus.empty) {
-            await dialogContext.beginDialog(this.id);
-        }
+    async beginFilingComplaint(step) {
+        await step.context.sendActivity(`You've reached the ComplaintDialog. Please describe the issue encountered.`);
+        return Dialog.EndOfTurn;
     }
 
-    // This is the first step of the WaterfallDialog.
-    // It kicks off the dialog with the QnA Maker with provided options.
-    async startInitialDialog(step) {
-        return await step.beginDialog(QNAMAKER_BASE_DIALOG);
+    async finishFilingComplaint(step) {
+        await step.context.sendActivity(`Whoops! Complaint filing process incomplete. Please try again later.`);
+        return step.cancelAllDialogs(true);
     }
 }
 

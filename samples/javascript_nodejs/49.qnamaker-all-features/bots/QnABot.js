@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 const { ActivityHandler } = require('botbuilder');
+const { runDialog } = require('botbuilder-dialogs');
 
 /**
  * A simple bot that responds to utterances with answers from QnA Maker.
@@ -29,7 +30,7 @@ class QnABot extends ActivityHandler {
             console.log('Running dialog with Message Activity.');
 
             // Run the Dialog with the new message Activity.
-            await this.dialog.run(context, this.dialogState);
+            await runDialog(this.dialog, context, this.dialogState);
 
             // By calling next() you ensure that the next BotHandler is run.
             await next();

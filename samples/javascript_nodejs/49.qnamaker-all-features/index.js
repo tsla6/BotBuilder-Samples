@@ -70,7 +70,12 @@ if (!endpointHostName.includes('/v5.0') && !endpointHostName.endsWith('/qnamaker
 const endpointKey = process.env.QnAEndpointKey || process.env.QnAAuthKey;
 
 // Create the main dialog.
-const dialog = new RootDialog(process.env.QnAKnowledgebaseId, endpointKey, endpointHostName, process.env.DefaultAnswer);
+const dialog = new RootDialog(
+    process.env.QnAKnowledgebaseId,
+    endpointKey,
+    endpointHostName,
+    process.env.DefaultAnswer,
+);
 
 // Create the bot's main handler.
 const bot = new QnABot(conversationState, userState, dialog);
