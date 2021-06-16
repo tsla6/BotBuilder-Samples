@@ -19,7 +19,7 @@ This template does not rely on any additional Azure Resources.
 
 ## Using this template
 
-This template can be instantiated directly from the command line by cloning this repository to your local environment. 
+This template can be instantiated directly from the command line by cloning this repository to your local environment.
 
 First, install [Yeoman][yeoman] using [npm][npm] (we assume you have pre-installed [node.js][nodejs]):
 
@@ -30,7 +30,7 @@ npm install -g yo
 Next, navigate to the `generator-bot-command-list` directory in your locally cloned repository, and install the package's dependencies using [npm][npm]:
 
 ```bash
-cd experimental\generators\generator-bot-command-list
+cd composer-samples/javascript_nodejs/generators/generator-bot-command-list
 npm install
 ```
 
@@ -48,7 +48,7 @@ Finally, generate your new bot using [Yeoman][yeoman], taking note of the follow
 - `--integration` may be one of either `webapp` or `functions`, and will default to `webapp` if not specified.
 
 ```bash
-yo {REPO_ROOT_PATH}\experimental\generators\generator-bot-command-list\generators\app '{BOT_NAME}' --platform '{dotnet|js}' --integration '{webapp|functions}'
+yo {REPO_ROOT_PATH}\composer-samples\javascript_nodejs\generators\generator-bot-command-list\generators\app '{BOT_NAME}' --platform '{dotnet|js}' --integration '{webapp|functions}'
 ```
 
 ## Next Steps
