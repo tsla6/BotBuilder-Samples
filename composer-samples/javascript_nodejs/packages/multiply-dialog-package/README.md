@@ -21,10 +21,10 @@ This is an example of a package that can be consumed by the new adaptive runtime
     git clone https://github.com/microsoft/botbuilder-samples.git
     ```
 
-- In a terminal, navigate to `experimental/adaptive-runtime-packages/multiply-dialog-package`
+- In a terminal, navigate to `composer-samples/javascript_nodejs/packages/multiply-dialog-package`
 
     ```bash
-    cd samples/typescript_nodejs/00.empty-bot
+    cd composer-samples/javascript_nodejs/packages/multiply-dialog-package
     ```
 
 - Install modules
